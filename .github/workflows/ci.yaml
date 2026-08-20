@@ -1,35 +1,49 @@
-name: CI/CD
+name: Movie Recommender CI/CD
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-
   test:
+    name: Test Application
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      # 2. Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
+      # 3. Install dependencies
       - name: Install dependencies
         run: |
-              pip install -r requirements.txt
-              pip install pytest
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
 
-- name: Run tests
-  run: pytest
+      # 4. Run tests
+      - name: Run tests
+        run: |
+          pytest
+
   deploy:
+    name: Deploy to Render
     needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to Render
-        run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+      # Deploy only after tests pass
+      - name: Trigger Render deployment
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
