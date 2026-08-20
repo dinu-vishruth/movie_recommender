@@ -7,8 +7,8 @@ def load_movie_lens():
     """
 
     # Adjust the path relative to app.py
-    movies_path = "../data/u.item"
-    ratings_path = "../data/u.data"
+    movies_path = "u.item"
+    ratings_path = "u.data"
 
     movies = pd.read_csv(
         movies_path, 
